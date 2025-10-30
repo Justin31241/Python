@@ -1,4 +1,5 @@
 import pygame
+import random
 
 
 
@@ -30,21 +31,23 @@ while running:
     clock.tick(60) 
 
     if ball_direction == "Left":
-        ball_x += ball_speed
-    else:
-        ball_x -= ball_speed
-
-    if ball_direction == "Left":
         distance = (((x - ball_x)**2) + ((y - ball_y)**2))**0.5
         radi_sum = (20 + 10)
         if distance <= radi_sum:
             ball_direction = "Right"
+            ball_speed -= 1
     else:
         distance = ((((1000 + x) - ball_x)**2) + ((y - ball_y)**2))**0.5
         radi_sum = (20 + 10)
         if distance <= radi_sum:
             ball_direction = "Left"
+            ball_speed -= 1
 
+
+    if ball_direction == "Left":
+        ball_x += ball_speed
+    else:
+        ball_x -= ball_speed
 
     keys = pygame.key.get_pressed()
 
