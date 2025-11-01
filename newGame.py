@@ -27,9 +27,12 @@ ball_speed_x = -player_speed / 6
 ball_speed_y = random.uniform(-1, 1) * (player_speed / 6)
 
 colliders = []
+obstacle_circles = []
 
 def check_collisions():
     global ball_x, ball_y, ball_speed_x, ball_speed_y
+    
+    paddle_was_hit = False
 
     for c in colliders:
         c_x, c_y = c['pos']
@@ -56,16 +59,29 @@ def check_collisions():
             ball_speed_y -= 2 * dot * ny
             
             if c.get('is_paddle', False):
-                 ball_speed_x *= 1.05
-                 ball_speed_y *= 1.05
+                  ball_speed_x *= 1.05
+                  ball_speed_y *= 1.05
+                  paddle_was_hit = True
+    
+    return paddle_was_hit
 
 
 def reset_ball():
     global ball_x, ball_y, ball_speed_x, ball_speed_y
+    global obstacle_circles 
+    
     ball_x = 500
     ball_y = 500
     ball_speed_x = -player_speed / 6 * random.choice([1, -1])
     ball_speed_y = random.uniform(-1, 1) * (player_speed / 6)
+    
+    obstacle_circles.clear() 
+
+
+def add_circle():
+    circle_y = random.randint(200, 800)
+    circle_x = random.randint(300, 700) 
+    obstacle_circles.append({'pos': (circle_x, circle_y), 'radius': 20})
 
 while running:
 
@@ -79,7 +95,7 @@ while running:
     ball_y += ball_speed_y
 
     if ball_x - ball_radius < 0 or ball_x + ball_radius > 1000:
-        reset_ball()
+        reset_ball() 
 
     if ball_y - ball_radius <= 0:
         ball_y = ball_radius
@@ -110,13 +126,16 @@ while running:
     colliders.clear()
     colliders.append({'pos': (player_x, player_y), 'radius': player_radius, 'is_paddle': True})
     colliders.append({'pos': (opponent_x, opponent_y), 'radius': opponent_radius, 'is_paddle': True})
+    
+    colliders.extend(obstacle_circles)
 
     for c in colliders:
         pygame.draw.circle(screen, white, (int(c['pos'][0]), int(c['pos'][1])), c['radius'])
 
     pygame.draw.circle(screen, red, (int(ball_x), int(ball_y)), ball_radius)
 
-    check_collisions()
+    if check_collisions():
+        add_circle() 
 
     pygame.display.flip()
 
